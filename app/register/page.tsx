@@ -2,6 +2,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { MdOutlinePersonAddAlt1 } from "react-icons/md";
+
+import { FcGoogle } from "react-icons/fc";
+import { headers } from "next/dist/server/request/headers";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -32,6 +36,27 @@ export default function RegisterPage() {
     setSuccess("Cadastro realizado com sucesso!");
     setForm({ name: "", email: "", password: "", confirmPassword: "" });
   };
+        
+        // Removed invalid 'ev.preventDefault();' as 'ev' is not defined.
+        fetch("/api/register", {
+          method: "POST",
+          body: JSON.stringify(form),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.error) {
+              setError(data.error);
+            } else {
+              setSuccess("Cadastro realizado com sucesso!");
+              setForm({ name: "", email: "", password: "", confirmPassword: "" });
+            }
+          })
+          .catch((err) => {
+            setError("Ocorreu um erro. Por favor, tente novamente.");
+          });
 
   return (
     <section className="flex flex-col items-center justify-center min-h-[70vh] py-8 px-2 sm:px-6 lg:px-8 bg-gradient-to-r from-emerald-100 to-lime-100">
@@ -99,7 +124,23 @@ export default function RegisterPage() {
             className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition"
           >
             Registrar
+            <MdOutlinePersonAddAlt1 className="inline-block ml-2 text-xl" />
           </button>
+          <div className="text-center mt-4">ou fazer login com </div>
+
+ <button
+            type="submit"
+            className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
+          >
+            Google
+            <FcGoogle className="inline-block ml-2 text-xl" />
+          </button>
+
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-600">
+              Já tem uma conta? <a href="/login" className="text-emerald-600 hover:text-emerald-800">Entrar</a>
+            </p>
+          </div>
         </form>
       </div>
     </section>
