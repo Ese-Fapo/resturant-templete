@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 
 import { FcGoogle } from "react-icons/fc";
@@ -16,6 +17,8 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,7 +26,7 @@ export default function RegisterPage() {
     setSuccess("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password || !form.confirmPassword) {
       setError("Por favor, preencha todos os campos.");
@@ -33,30 +36,33 @@ export default function RegisterPage() {
       setError("As senhas não coincidem.");
       return;
     }
-    setSuccess("Cadastro realizado com sucesso!");
-    setForm({ name: "", email: "", password: "", confirmPassword: "" });
+
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+        setSuccess("");
+      } else {
+        setSuccess("Cadastro realizado com sucesso!");
+        setError("");
+        setForm({ name: "", email: "", password: "", confirmPassword: "" });
+      }
+    } catch (err) {
+      setError("Ocorreu um erro. Por favor, tente novamente.");
+      setSuccess("");
+    }
   };
-        
-        // Removed invalid 'ev.preventDefault();' as 'ev' is not defined.
-        fetch("/api/register", {
-          method: "POST",
-          body: JSON.stringify(form),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.error) {
-              setError(data.error);
-            } else {
-              setSuccess("Cadastro realizado com sucesso!");
-              setForm({ name: "", email: "", password: "", confirmPassword: "" });
-            }
-          })
-          .catch((err) => {
-            setError("Ocorreu um erro. Por favor, tente novamente.");
-          });
 
   return (
     <section className="flex flex-col items-center justify-center min-h-[70vh] py-8 px-2 sm:px-6 lg:px-8 bg-gradient-to-r from-emerald-100 to-lime-100">
@@ -92,29 +98,51 @@ export default function RegisterPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                autoComplete="new-password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none transition"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  id="password"
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none transition pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="flex-1">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                id="confirmPassword"
-                autoComplete="new-password"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none transition"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  id="confirmPassword"
+                  autoComplete="new-password"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none transition pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
           </div>
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
