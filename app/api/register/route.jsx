@@ -1,5 +1,7 @@
+
 import mongoose from "mongoose";
 import User from "../../../models/user";
+import bcrypt from "bcrypt";
 
 export async function POST(req) {
   try {
@@ -18,8 +20,9 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Usuário já cadastrado." }), { status: 409 });
     }
 
-    // Create new user
-    await User.create({ name, email, password });
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ name, email, password: hashedPassword });
     return new Response(JSON.stringify({ message: "Cadastro realizado com sucesso!" }), { status: 201 });
   } catch (error) {
     return new Response(JSON.stringify({ error: "Erro ao registrar usuário." }), { status: 500 });
