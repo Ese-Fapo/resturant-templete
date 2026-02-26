@@ -6,7 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 
 import { FcGoogle } from "react-icons/fc";
-import { headers } from "next/dist/server/request/headers";
+
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -20,13 +20,13 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
     setSuccess("");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password || !form.confirmPassword) {
       setError("Por favor, preencha todos os campos.");
@@ -58,7 +58,7 @@ export default function RegisterPage() {
         setError("");
         setForm({ name: "", email: "", password: "", confirmPassword: "" });
       }
-    } catch (err) {
+    } catch {
       setError("Ocorreu um erro. Por favor, tente novamente.");
       setSuccess("");
     }
@@ -165,8 +165,8 @@ export default function RegisterPage() {
           </button>
 
           <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
-              Já tem uma conta? <a href="/login" className="text-emerald-600 hover:text-emerald-800">Entrar</a>
+            <p className="font-bold text-gray-600">
+              Já tem uma conta? <a href="/login" className="text-emerald-600 hover:text-emerald-800 text-2xl underline">Entrar</a>
             </p>
           </div>
         </form>
