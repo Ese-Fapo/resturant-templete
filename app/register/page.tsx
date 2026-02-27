@@ -5,6 +5,7 @@ import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -18,13 +19,13 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
     setSuccess("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password || !form.confirmPassword) {
       setError("Por favor, preencha todos os campos.");
@@ -159,8 +160,8 @@ export default function RegisterPage() {
           </button>
           <div className="text-center mt-4">ou fazer login com </div>
 
- <button
-            type="submit"
+ <button onClick={() => signIn('google')}
+            type="button"
             className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
           >
             Google
@@ -177,3 +178,5 @@ export default function RegisterPage() {
     </section>
   );
 }
+    
+    

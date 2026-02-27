@@ -89,7 +89,7 @@ export default function LoginPage() {
 
         <div className="text-center my-2">Ou login com </div>
 
-         <button
+         <button onClick={() => signIn('google')}
             type="submit"
             className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
           >
