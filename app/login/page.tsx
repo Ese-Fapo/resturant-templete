@@ -2,33 +2,51 @@
 
 
 import React, { useState } from "react";
+import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotMessage, setForgotMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: (e.currentTarget.elements.namedItem("email") as HTMLInputElement).value,
-        password: (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value,
-      }),
+    setLoginMessage("");
+    setLoginSuccess(false);
+    const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
     });
+    if (result?.ok) {
+      setLoginMessage("Login realizado com sucesso! Bem-vindo de volta!");
+      setLoginSuccess(true);
+      // Optionally, redirect or reload page to update navbar
+      // window.location.reload();
+    } else {
+      setLoginMessage("Falha no login. Verifique suas credenciais.");
+      setLoginSuccess(false);
+    }
   }
 
   return (
     <section className="mt-8 "> 
       <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
       <form className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md border border-gray-200" onSubmit={handleSubmit}>
+        {loginMessage && (
+          <div className={`mb-4 text-center text-lg font-semibold ${loginSuccess ? "text-emerald-600" : "text-red-500"}`}>
+            {loginMessage}
+          </div>
+        )}
+        {loginSuccess && <ConfettiAnimation />}
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <input

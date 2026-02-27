@@ -1,6 +1,7 @@
 
-import mongoose from "mongoose";
-import User from "../../../models/user";
+
+import dbConnect from "@/lib/mongoose";
+import User from "@/models/user";
 import bcrypt from "bcrypt";
 
 export async function POST(req) {
@@ -12,7 +13,7 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Todos os campos são obrigatórios." }), { status: 400 });
     }
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    await dbConnect();
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -25,6 +26,7 @@ export async function POST(req) {
     await User.create({ name, email, password: hashedPassword });
     return new Response(JSON.stringify({ message: "Cadastro realizado com sucesso!" }), { status: 201 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Erro ao registrar usuário." }), { status: 500 });
+    console.error("Registration error:", error);
+    return new Response(JSON.stringify({ error: "Erro ao registrar usuário.", details: error?.message }), { status: 500 });
   }
 }

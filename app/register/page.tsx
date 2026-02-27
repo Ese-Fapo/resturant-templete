@@ -1,12 +1,10 @@
-
 "use client";
 
 import React, { useState } from "react";
+import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
-
 import { FcGoogle } from "react-icons/fc";
-
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -40,14 +38,14 @@ export default function RegisterPage() {
     try {
       const res = await fetch("/api/register", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
           password: form.password,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
       const data = await res.json();
       if (data.error) {
@@ -146,7 +144,12 @@ export default function RegisterPage() {
             </div>
           </div>
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          {success && <div className="text-green-600 text-sm text-center">{success}</div>}
+          {success && (
+            <>
+              <div className="text-green-600 text-sm text-center">{success}</div>
+              <ConfettiAnimation />
+            </>
+          )}
           <button
             type="submit"
             className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition"
@@ -174,4 +177,3 @@ export default function RegisterPage() {
     </section>
   );
 }
-
