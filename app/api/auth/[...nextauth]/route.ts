@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "@/models/user";
-import dbConnect from "@/lib/mongodb";
+//import dbConnect from "@/lib/mongodb";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -22,7 +22,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        await dbConnect();
+        // await dbConnect();
 
         const foundUser = await User.findOne({ email: credentials.email });
         if (!foundUser) return null;

@@ -27,6 +27,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+  
     if (!form.name || !form.email || !form.password || !form.confirmPassword) {
       setError("Por favor, preencha todos os campos.");
       return;
