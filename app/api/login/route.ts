@@ -22,9 +22,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Remove sensitive info before sending user data
-    const { password: _, ...userData } = user;
+    const userData = JSON.parse(JSON.stringify(user)) as Record<string, unknown>;
+    if (userData && Object.prototype.hasOwnProperty.call(userData, 'password')) {
+     
+      delete (userData as any).password;
+    }
     return NextResponse.json({ success: true, user: userData });
   } catch (error) {
+    console.error('Login error:', error);
     return NextResponse.json({ success: false, message: 'Server error.' }, { status: 500 });
   }
 }

@@ -16,6 +16,7 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Restaurant Menu App",
   description: "An app to browse and order from restaurant menus.",
+  viewport: 'width=device-width, initial-scale=1',
 };
 
 export default function RootLayout({
