@@ -1,15 +1,38 @@
-import { promises as fs } from "fs";
-import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 
+import cloudinary from "@/lib/cloudinary";
 import connectDB from "@/lib/mongoose";
 import User from "@/models/user";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+const hasCloudinaryEnv =
+  !!process.env.CLOUDINARY_CLOUD_NAME &&
+  !!process.env.CLOUDINARY_API_KEY &&
+  !!process.env.CLOUDINARY_API_SECRET;
+
+async function uploadToCloudinary(buffer: Buffer) {
+  return await new Promise<{
+    secure_url: string;
+  }>((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "avatars",
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error || !result) {
+          return reject(error || new Error("Upload failed"));
+        }
+        resolve({ secure_url: result.secure_url });
+      }
+    );
+
+    uploadStream.end(buffer);
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +40,13 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    }
+
+    if (!hasCloudinaryEnv) {
+      return NextResponse.json(
+        { error: "Configuração do Cloudinary ausente no servidor." },
+        { status: 500 }
+      );
     }
 
     const formData = await req.formData();
@@ -34,22 +64,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Imagem deve ter no máximo 2MB." }, { status: 400 });
     }
 
-    const uploadsDir = join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
-
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${randomUUID()}.${file.type.split("/")[1] || "jpg"}`;
-    const filePath = join(uploadsDir, fileName);
-
-    await fs.writeFile(filePath, fileBuffer);
-
-    const publicUrl = `/uploads/${fileName}`;
+    const { secure_url } = await uploadToCloudinary(fileBuffer);
 
     await connectDB();
 
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
-      { image: publicUrl },
+      { image: secure_url },
       { new: true }
     );
 
@@ -59,7 +81,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       message: "Avatar atualizado com sucesso.",
-      image: publicUrl,
+      image: secure_url,
     });
   } catch (error) {
     console.error("Erro ao fazer upload do avatar:", error);

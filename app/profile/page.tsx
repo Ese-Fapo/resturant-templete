@@ -135,6 +135,20 @@ export default function ProfilePage() {
             <p className="text-gray-600">Bem-vindo ao seu perfil! Aqui você pode ver suas informações e pedidos.</p>
           </div>
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-emerald-50 p-8 sm:p-10">
+        {(error || success) && (
+          <div className="mb-6 text-left">
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                {success}
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex flex-col items-center gap-4 text-center mb-6">
           <div className="relative">
             <div className="bg-gray-100 p-2 " aria-hidden />
@@ -186,11 +200,7 @@ export default function ProfilePage() {
             <p className="text-lg font-semibold text-gray-800 break-words">{userEmail}</p>
           </div>
 
-          <div className="sm:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="text-left">
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              {success && <p className="text-sm text-emerald-600">{success}</p>}
-            </div>
+          <div className="sm:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
             <button
               type="submit"
               disabled={!isDirty || isSaving}
