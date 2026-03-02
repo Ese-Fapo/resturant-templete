@@ -66,7 +66,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-[70vh] py-8 px-2 sm:px-6 lg:px-8 bg-gradient-to-r from-emerald-100 to-lime-100">
+    <section className="flex flex-col items-center justify-center min-h-[70vh] py-8 px-2 sm:px-6 lg:px-8 bg-linear-to-r from-emerald-100 to-lime-100">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-gray-100">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-emerald-700 mb-6">Crie sua conta</h2>
         <form className="space-y-5" onSubmit={handleSubmit}>

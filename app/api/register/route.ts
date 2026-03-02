@@ -1,12 +1,53 @@
-import  User  from "@/models/user";
-import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
+import User from "@/models/user";
+import connectDB from "@/lib/mongoose";
 
 export async function POST(request: Request) {
+        try {
+                const { name, email, password } = await request.json();
 
-        const body = await request.json();
-       mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/food_ordering");
+                if (!name || !email || !password) {
+                        return NextResponse.json(
+                                { error: "Nome, email e senha são obrigatórios." },
+                                { status: 400 }
+                        );
+                }
 
-        const createdUser = await User.create(body);
-        return Response.json(createdUser);
-       
+                await connectDB();
+
+                const existingUser = await User.findOne({ email });
+                if (existingUser) {
+                        return NextResponse.json(
+                                { error: "Este email já está cadastrado." },
+                                { status: 409 }
+                        );
+                }
+
+                const hashedPassword = await bcrypt.hash(password, 10);
+
+                const createdUser = await User.create({
+                        name,
+                        email,
+                        password: hashedPassword,
+                });
+
+                return NextResponse.json(
+                        {
+                                message: "Cadastro realizado com sucesso.",
+                                user: {
+                                        id: createdUser._id,
+                                        name: createdUser.name,
+                                        email: createdUser.email,
+                                },
+                        },
+                        { status: 201 }
+                );
+        } catch (error) {
+                console.error("Erro ao registrar usuário:", error);
+                return NextResponse.json(
+                        { error: "Não foi possível completar o cadastro agora." },
+                        { status: 500 }
+                );
+        }
 }
