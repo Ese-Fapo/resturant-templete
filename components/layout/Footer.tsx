@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { CiFacebook } from "react-icons/ci";
 import { FaTwitter } from "react-icons/fa";
@@ -11,7 +12,14 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         {/* Branding */}
         <div className="flex items-center gap-3">
-          <img src="/images/3chefs.avif" alt="Logo 3 Chefs" className="w-12 h-12 rounded-full shadow-lg" />
+          <Image
+            src="/images/3chefs.avif"
+            alt="Logo 3 Chefs"
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-full shadow-lg"
+            priority
+          />
           <span className="text-2xl font-bold tracking-wide text-white">Chefs</span>
         </div>
         {/* Navigation */}

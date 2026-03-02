@@ -1,11 +1,13 @@
 import bcrypt from "bcryptjs";
-import User from "@/models/user";
-//import dbConnect from "@/lib/mongodb";
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-const handler = NextAuth({
+import connectDB from "@/lib/mongoose";
+import User from "@/models/user";
+
+export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
@@ -22,7 +24,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // await dbConnect();
+        await connectDB();
 
         const foundUser = await User.findOne({ email: credentials.email });
         if (!foundUser) return null;
@@ -37,6 +39,7 @@ const handler = NextAuth({
         return {
           id: foundUser._id.toString(),
           email: foundUser.email,
+          name: foundUser.name,
         };
       },
     }),
@@ -44,6 +47,68 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
-});
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        const typedUser = user as {
+          id?: string;
+          _id?: string;
+          name?: string | null;
+          email?: string | null;
+          image?: string | null;
+        };
+
+        token.id = typedUser.id ?? typedUser._id ?? token.sub;
+        token.name = typedUser.name ?? token.name;
+        token.email = typedUser.email ?? token.email;
+        token.picture = typedUser.image ?? token.picture;
+        return token;
+      }
+
+      // Refresh token data from DB on subsequent calls to reflect profile edits
+      if (token.id || token.email) {
+        await connectDB();
+        const dbUser = await User.findOne({
+          $or: [
+            { _id: token.id },
+            { email: token.email },
+          ],
+        })
+          .lean()
+          .exec();
+
+        if (dbUser) {
+          const typedDbUser = dbUser as {
+            _id?: { toString(): string } | string;
+            name?: string | null;
+            email?: string | null;
+            image?: string | null;
+          };
+
+          const idString = typeof typedDbUser._id === "string" ? typedDbUser._id : typedDbUser._id?.toString();
+
+          token.id = idString ?? token.id;
+          token.name = typedDbUser.name ?? token.name;
+          token.email = typedDbUser.email ?? token.email;
+          token.picture = typedDbUser.image ?? token.picture;
+        }
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        const typedToken = token as JWT & { id?: string };
+        session.user.id = typedToken.id;
+        session.user.name = (typedToken.name as string | undefined) ?? session.user.name;
+        session.user.email = (typedToken.email as string | undefined) ?? session.user.email;
+        session.user.image = (typedToken.picture as string | undefined) ?? session.user.image;
+      }
+      return session;
+    },
+  },
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
