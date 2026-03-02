@@ -11,15 +11,15 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         {/* Branding */}
         <div className="flex items-center gap-3">
-          <img src="/images/3chefs.avif" alt="3 Chefs Logo" className="w-12 h-12 rounded-full shadow-lg" />
+          <img src="/images/3chefs.avif" alt="Logo 3 Chefs" className="w-12 h-12 rounded-full shadow-lg" />
           <span className="text-2xl font-bold tracking-wide text-white">Chefs</span>
         </div>
         {/* Navigation */}
         <nav className="flex flex-wrap gap-6 text-sm font-medium">
-          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-          <a href="/menu" className="hover:text-primary transition-colors">Menu</a>
-          <a href="/about" className="hover:text-primary transition-colors">About</a>
-          <a href="/contact" className="hover:text-primary transition-colors">Contact</a>
+          <Link href="/" className="hover:text-primary transition-colors">Início</Link>
+          <a href="/menu" className="hover:text-primary transition-colors">Cardápio</a>
+          <a href="/about" className="hover:text-primary transition-colors">Sobre</a>
+          <a href="/contact" className="hover:text-primary transition-colors">Contato</a>
         </nav>
         {/* Social Links */}
         <div className="flex gap-4">
@@ -35,7 +35,7 @@ export const Footer = () => {
         </div>
       </div>
       <div className="mt-8 text-center text-xs text-gray-500">
-        &copy; {new Date().getFullYear()}  Chefs. All rights reserved.
+        &copy; {new Date().getFullYear()} Chefs. Todos os direitos reservados.
       </div>
     </footer>
   );
