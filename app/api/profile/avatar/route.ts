@@ -69,19 +69,23 @@ export async function POST(req: NextRequest) {
     let secure_url: string;
     try {
       ({ secure_url } = await uploadToCloudinary(fileBuffer));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Cloudinary upload error:", err);
 
-      const message = err?.message || "Falha ao enviar imagem para o Cloudinary.";
-      const httpCode = err?.http_code;
-      const cloudError = err?.error || err;
+      const typedErr = err as { message?: string; http_code?: number; error?: unknown } | undefined;
+      const message = typedErr?.message || "Falha ao enviar imagem para o Cloudinary.";
+      const httpCode = typedErr?.http_code;
+      const cloudError = typedErr?.error;
 
       return NextResponse.json(
         {
           error: "Falha ao enviar imagem para o Cloudinary.",
           details: message,
           code: httpCode,
-          cloudinary: typeof cloudError === "object" ? cloudError?.message || cloudError?.name : undefined,
+          cloudinary:
+            typeof cloudError === "object" && cloudError !== null
+              ? (cloudError as { message?: string; name?: string }).message || (cloudError as { name?: string }).name
+              : undefined,
         },
         { status: 502 }
       );

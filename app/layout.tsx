@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import NextAuthProvider from "@/components/layout/NextAuthProvider";
+import { Toaster } from "react-hot-toast";
 
 
 
@@ -37,6 +38,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         </NextAuthProvider>
       </body>
     </html>

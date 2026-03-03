@@ -22,6 +22,20 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  phone: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  addresses: [
+    {
+      street: { type: String, trim: true, required: true },
+      city: { type: String, trim: true, required: true },
+      postalCode: { type: String, trim: true, required: true },
+      label: { type: String, trim: true, default: "Principal" },
+      isDefault: { type: Boolean, default: false },
+    },
+  ],
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

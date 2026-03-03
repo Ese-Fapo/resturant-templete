@@ -56,12 +56,14 @@ export const authOptions: NextAuthOptions = {
           name?: string | null;
           email?: string | null;
           image?: string | null;
+          phone?: string | null;
         };
 
         token.id = typedUser.id ?? typedUser._id ?? token.sub;
         token.name = typedUser.name ?? token.name;
         token.email = typedUser.email ?? token.email;
         token.picture = typedUser.image ?? token.picture;
+        token.phone = typedUser.phone ?? token.phone;
         return token;
       }
 
@@ -83,6 +85,7 @@ export const authOptions: NextAuthOptions = {
             name?: string | null;
             email?: string | null;
             image?: string | null;
+            phone?: string | null;
           };
 
           const idString = typeof typedDbUser._id === "string" ? typedDbUser._id : typedDbUser._id?.toString();
@@ -91,6 +94,7 @@ export const authOptions: NextAuthOptions = {
           token.name = typedDbUser.name ?? token.name;
           token.email = typedDbUser.email ?? token.email;
           token.picture = typedDbUser.image ?? token.picture;
+          token.phone = typedDbUser.phone ?? token.phone;
         }
       }
 
@@ -103,6 +107,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = (typedToken.name as string | undefined) ?? session.user.name;
         session.user.email = (typedToken.email as string | undefined) ?? session.user.email;
         session.user.image = (typedToken.picture as string | undefined) ?? session.user.image;
+        session.user.phone = (typedToken.phone as string | undefined) ?? session.user.phone;
       }
       return session;
     },
