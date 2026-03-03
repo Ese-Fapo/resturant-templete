@@ -14,6 +14,13 @@ type Address = {
   isDefault?: boolean;
 };
 
+type ProfileCache = {
+  name: string;
+  phone: string;
+  email: string;
+  addresses: Address[];
+};
+
 export default function ProfilePage() {
   const router = useRouter();
   const { data: session, status, update } = useSession();
@@ -37,47 +44,61 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadProfile = async () => {
+      // 1) Attempt local cache for instant render
+      if (typeof window !== "undefined") {
+        const cachedRaw = localStorage.getItem("profile-cache");
+        if (cachedRaw) {
+          try {
+            const cached: ProfileCache = JSON.parse(cachedRaw);
+            if (cached.name) setName(cached.name);
+            if (cached.phone) setPhone(cached.phone);
+            if (Array.isArray(cached.addresses) && cached.addresses.length) {
+              setAddresses(cached.addresses);
+            }
+            setInitialLoaded(true);
+          } catch (e) {
+            console.warn("Failed to parse profile cache", e);
+          }
+        }
+      }
+
+      // 2) Fetch fresh data
       try {
         const res = await fetch("/api/profile");
         if (res.ok) {
           const data = await res.json();
           if (data?.user?.name) setName(data.user.name);
           if (typeof data?.user?.phone === "string") setPhone(data.user.phone);
+          if (Array.isArray(data?.user?.addresses)) {
+            setAddresses(data.user.addresses.length ? data.user.addresses : [{ street: "", city: "", postalCode: "", isDefault: true }]);
+          }
+          cacheProfile({
+            name: data?.user?.name || "",
+            phone: data?.user?.phone || "",
+            email: data?.user?.email || session?.user?.email || "",
+            addresses: Array.isArray(data?.user?.addresses) ? data.user.addresses : [],
+          });
           setInitialLoaded(true);
-        } else {
-          // fallback to session data if request fails
-          if (session?.user?.name) setName(session.user.name);
-          if (session?.user?.phone) setPhone(session.user.phone);
-          setInitialLoaded(true);
+          setIsLoadingAddresses(false);
+          return;
         }
       } catch (err) {
         console.error("Erro ao carregar perfil", err);
+      }
+
+      // 3) Fallback to session if API fails
+      if (!initialLoaded) {
         if (session?.user?.name) setName(session.user.name);
         if (session?.user?.phone) setPhone(session.user.phone);
         setInitialLoaded(true);
       }
+      setIsLoadingAddresses(false);
     };
 
+    setIsLoadingAddresses(true);
     loadProfile();
-  }, [session?.user?.name, session?.user?.phone]);
-
-  useEffect(() => {
-    const loadAddresses = async () => {
-      setIsLoadingAddresses(true);
-      try {
-        const res = await fetch("/api/profile/address");
-        if (!res.ok) throw new Error("Não foi possível carregar endereços.");
-        const data = await res.json();
-        setAddresses(data.addresses?.length ? data.addresses : [{ street: "", city: "", postalCode: "", isDefault: true }]);
-      } catch (err) {
-        console.error(err);
-        setAddresses([{ street: "", city: "", postalCode: "", isDefault: true }]);
-      } finally {
-        setIsLoadingAddresses(false);
-      }
-    };
-    loadAddresses();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.name, session?.user?.phone, session?.user?.email]);
 
   const userImage = session?.user?.image || "https://via.placeholder.com/150";
   const userEmail = session?.user?.email || "";
@@ -137,6 +158,13 @@ export default function ProfilePage() {
 
       setSuccess("Nome atualizado com sucesso!");
       toast.success("Perfil atualizado!");
+
+      cacheProfile({
+        name: trimmedName,
+        phone: phone.trim(),
+        email: session?.user?.email || "",
+        addresses,
+      });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Erro inesperado. Tente novamente.";
       setError(message);
@@ -189,6 +217,12 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error(data?.error || "Não foi possível salvar endereços.");
       setAddresses(data.addresses || []);
       setSuccess("Endereços atualizados com sucesso!");
+      cacheProfile({
+        name,
+        phone,
+        email: session?.user?.email || "",
+        addresses: data.addresses || [],
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro inesperado ao salvar endereços.";
       setError(message);
@@ -434,4 +468,13 @@ export default function ProfilePage() {
         </div>
     </section>
   );
+}
+
+function cacheProfile(profile: ProfileCache) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("profile-cache", JSON.stringify(profile));
+  } catch (err) {
+    console.warn("Failed to cache profile", err);
+  }
 }
