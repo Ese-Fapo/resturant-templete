@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ChangeEvent } from "react";
 import { useSession } from "next-auth/react";
 
+
 export default function ProfilePage() {
   const router = useRouter();
   const { data: session, status, update } = useSession();

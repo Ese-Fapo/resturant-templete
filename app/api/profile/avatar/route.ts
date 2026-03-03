@@ -1,17 +1,15 @@
+export const runtime = "nodejs"; // Ensure Node runtime (Cloudinary requires Node APIs like Buffer)
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
-import cloudinary from "@/lib/cloudinary";
+import cloudinary, { ensureCloudinaryConfig } from "@/lib/cloudinary";
 import connectDB from "@/lib/mongoose";
 import User from "@/models/user";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-const hasCloudinaryEnv =
-  !!process.env.CLOUDINARY_CLOUD_NAME &&
-  !!process.env.CLOUDINARY_API_KEY &&
-  !!process.env.CLOUDINARY_API_SECRET;
 
 async function uploadToCloudinary(buffer: Buffer) {
   return await new Promise<{
@@ -42,9 +40,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
     }
 
-    if (!hasCloudinaryEnv) {
+    try {
+      ensureCloudinaryConfig();
+    } catch (error) {
+      console.error("Cloudinary config error:", error);
       return NextResponse.json(
-        { error: "Configuração do Cloudinary ausente no servidor." },
+        { error: "Configuração do Cloudinary ausente ou inacessível." },
         { status: 500 }
       );
     }
@@ -65,7 +66,26 @@ export async function POST(req: NextRequest) {
     }
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const { secure_url } = await uploadToCloudinary(fileBuffer);
+    let secure_url: string;
+    try {
+      ({ secure_url } = await uploadToCloudinary(fileBuffer));
+    } catch (err: any) {
+      console.error("Cloudinary upload error:", err);
+
+      const message = err?.message || "Falha ao enviar imagem para o Cloudinary.";
+      const httpCode = err?.http_code;
+      const cloudError = err?.error || err;
+
+      return NextResponse.json(
+        {
+          error: "Falha ao enviar imagem para o Cloudinary.",
+          details: message,
+          code: httpCode,
+          cloudinary: typeof cloudError === "object" ? cloudError?.message || cloudError?.name : undefined,
+        },
+        { status: 502 }
+      );
+    }
 
     await connectDB();
 
@@ -85,6 +105,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Erro ao fazer upload do avatar:", error);
-    return NextResponse.json({ error: "Não foi possível fazer upload agora." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Não foi possível fazer upload agora." },
+      { status: 500 }
+    );
   }
 }
