@@ -94,7 +94,11 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="lg:hidden p-2.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className={`lg:hidden p-2.5 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+              menuOpen 
+                ? 'bg-linear-to-br from-emerald-400 to-lime-500 text-white shadow-lg' 
+                : 'text-gray-700 bg-linear-to-br from-emerald-50 to-lime-50 hover:from-emerald-100 hover:to-lime-100 hover:shadow-md'
+            }`}
             onClick={() => setMenuOpen(prev => !prev)}
             aria-expanded={menuOpen}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
@@ -110,12 +114,12 @@ const Header = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden fixed inset-y-0 right-0 w-full sm:w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out z-50 ${
+        className={`lg:hidden fixed inset-y-0 right-0 w-full sm:w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-out z-50 flex flex-col h-screen ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Mobile Menu Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-linear-to-br from-emerald-50 to-lime-50">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100 bg-linear-to-br from-emerald-50 via-lime-50 to-green-50 shadow-md">
           <div className="flex items-center gap-2">
             <span className="text-3xl">🍕</span>
             <span className="text-xl font-black bg-linear-to-r from-emerald-600 to-lime-600 bg-clip-text text-transparent">
@@ -132,7 +136,7 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Content */}
-        <nav className="flex flex-col p-5 gap-2">
+        <nav className="flex flex-col p-4 sm:p-5 gap-2 overflow-y-auto">
           <Link
             href="/"
             className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
