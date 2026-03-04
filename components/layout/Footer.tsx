@@ -43,7 +43,7 @@ export const Footer = () => {
         </div>
       </div>
       <div className="mt-6 sm:mt-8 text-center text-xs text-gray-500">
-        &copy; {new Date().getFullYear()} Chefs. Todos os direitos reservados
+        &copy; {new Date().getFullYear()} Chefs. Todos os direitos reservados..
       </div>
     </footer>
   );
