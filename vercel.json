@@ -1,11 +1,5 @@
 {
   "framework": "nextjs",
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "API URL for environment",
-      "required": false
-    }
-  },
   "regions": ["iad"],
   "functions": {
     "api/**/*.ts": {
