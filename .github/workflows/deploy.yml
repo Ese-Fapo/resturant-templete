@@ -1,0 +1,131 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: deployment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build & Test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linting
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Run tests
+      run: npm test -- --passWithNoTests
+      continue-on-error: true
+
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+
+  deploy-preview:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    name: Deploy Preview
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Vercel Preview
+      uses: vercel/action@v7
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        github-comment: true
+        github-pr: true
+      env:
+        VERCEL_ENV: preview
+
+  deploy-production:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    name: Deploy Production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Vercel Production
+      uses: vercel/action@v7
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: --prod
+        production: true
+      env:
+        VERCEL_ENV: production
+
+    - name: Notify deployment success
+      if: success()
+      run: echo "✅ Production deployment to Vercel completed successfully!"
+
+    - name: Notify Slack on success
+      if: ${{ success() && secrets.SLACK_WEBHOOK_URL != '' }}
+      uses: slackapi/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "✅ Vercel Production Deployment Successful",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*✅ Vercel Deployment Successful*\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\nDeployed to: https://vercel.com/${{ secrets.VERCEL_ORG_ID }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Notify Slack on failure
+      if: ${{ failure() && secrets.SLACK_WEBHOOK_URL != '' }}
+      uses: slackapi/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "❌ Vercel Production Deployment Failed",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*❌ Vercel Deployment Failed*\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCheck logs: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
