@@ -186,7 +186,7 @@ export default function RegisterPage() {
             type="button"
             className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
           >
-            Google
+            Google.
             <FcGoogle className="inline-block ml-2 text-xl" />
           </button>
 
