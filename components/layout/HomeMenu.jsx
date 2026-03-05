@@ -17,7 +17,7 @@ const HomeMenu = () => {
             </div>
             <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-lime-800 mb-2 text-center">Pizza Margherita</h3>
             <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center leading-relaxed">Clássica com molho de tomate, mozzarella e manjericão fresco.</p>
-            <Link href="#" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 14,99</span></Link>
+            <Link href="/menu" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 14,99</span></Link>
           </div>
 
           <div className="group bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-4 sm:p-6 flex flex-col items-center border border-lime-100 hover:border-lime-400">
@@ -26,7 +26,7 @@ const HomeMenu = () => {
             </div>
             <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-lime-800 mb-2 text-center">Spaghetti Carbonara</h3>
             <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center leading-relaxed">Massa italiana com ovos, queijo, pancetta e pimenta-do-reino.</p>
-            <Link href="#" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 26,00</span></Link>
+            <Link href="/menu" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 26,00</span></Link>
           </div>
 
           <div className="group bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-4 sm:p-6 flex flex-col items-center border border-lime-100 hover:border-lime-400">
@@ -35,7 +35,7 @@ const HomeMenu = () => {
             </div>
             <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-lime-800 mb-2 text-center">Salada Caesar</h3>
             <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center leading-relaxed">Alface crocante, molho Caesar, croutons e parmesão ralado.</p>
-            <Link href="#" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 9,99</span></Link>
+            <Link href="/menu" className="rounded-full bg-linear-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-700 text-white px-6 sm:px-8 py-2 sm:py-2.5 font-semibold text-sm sm:text-base shadow-lg transition-all duration-200 mt-auto whitespace-nowrap">Pedir agora <span className="font-bold">R$ 9,99</span></Link>
           </div>
         </div>
       </div>

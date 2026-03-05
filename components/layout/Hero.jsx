@@ -25,11 +25,11 @@ export default function Hero() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
           {/* CTA: Go to menu button */}
-          <Link href="/menu" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-emerald-500 text-white rounded-full font-semibold text-sm sm:text-base shadow-lg hover:bg-emerald-600 hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
+          <Link href="/#menu" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-emerald-500 text-white rounded-full font-semibold text-sm sm:text-base shadow-lg hover:bg-emerald-600 hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
             Ver cardápio <FaPizzaSlice />
           </Link>
           {/* CTA: Order now button */}
-          <Link href="/menu" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-emerald-600 border border-emerald-400 rounded-full font-semibold text-sm sm:text-base shadow hover:bg-emerald-50 hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
+          <Link href="/#menu" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-emerald-600 border border-emerald-400 rounded-full font-semibold text-sm sm:text-base shadow hover:bg-emerald-50 hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
             Peça agora <FaBellConcierge />
           </Link>
         </div>

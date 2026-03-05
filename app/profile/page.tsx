@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ChangeEvent } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 type Address = {
   street: string;
@@ -278,10 +279,42 @@ export default function ProfilePage() {
 
   return (
     <section className="text-center items-center mt-10 px-4">
-        <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-emerald-700 items-center">Minha profile </h1>
-            <p className="text-gray-600">Bem-vindo ao seu perfil! Aqui você pode ver suas informações e pedidos.</p>
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex-1">
+            <Link href="/profile" className="text-3xl sm:text-4xl font-bold text-emerald-700 inline-block hover:text-emerald-800 transition-colors">
+              Minha Profile
+            </Link>
+            <p className="text-gray-600 mt-2 mb-4">Gerencie suas informações pessoais e endereços aqui.</p>
           </div>
+          
+          {!session?.user?.admin && (
+            <Link 
+              href="/admin-login" 
+              className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors shadow-md hover:shadow-lg"
+            >
+              🔐 Admin
+            </Link>
+          )}
+        </div>
+          {session?.user?.admin && (
+            <div className="flex flex-wrap gap-2 items-center mt-4 mb-6 pt-4 border-t border-gray-200">
+              <span className="text-sm font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Ferramentas de Admin
+              </span>
+              <Link href="/categories" className="px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-500 text-emerald-700 font-semibold transition-colors shadow-sm hover:shadow-md">
+                Categorias
+              </Link>
+              <Link href="/categories" className="px-4 py-2 rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-colors">
+                Itens do Menu
+              </Link>
+              <Link href="/users" className="px-4 py-2 rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-colors">
+                Usuários
+              </Link>
+            </div>
+          )}
         {(error || success) && (
           <div className="mb-6 text-left">
             {error && (
@@ -360,7 +393,44 @@ export default function ProfilePage() {
 
           <div className="p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm bg-emerald-50/40 text-left">
             <p className="text-sm font-semibold text-emerald-700">Email</p>
-            <p className="text-lg font-semibold text-gray-800 break-words">{userEmail}</p>
+            <p className="text-lg font-semibold text-gray-800 wrap-break-word">{userEmail}</p>
+          </div>
+
+          <div className={`p-4 sm:p-5 rounded-xl border shadow-sm text-left ${
+            session?.user?.admin 
+              ? "border-amber-200 bg-linear-to-br from-amber-50 to-amber-100/50" 
+              : "border-gray-100 bg-emerald-50/40"
+          }`}>
+            <p className={`text-sm font-semibold mb-2 ${session?.user?.admin ? "text-amber-700" : "text-emerald-700"}`}>
+              Tipo de Conta
+            </p>
+            <div className="flex items-center gap-3">
+              {session?.user?.admin ? (
+                <>
+                  <div className="shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-amber-700">Administrador</p>
+                    <p className="text-xs text-amber-600">Acesso total ao sistema</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="shrink-0 w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800">Usuário Regular</p>
+                    <p className="text-xs text-gray-600">Acesso padrão</p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="sm:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">

@@ -25,9 +25,9 @@ export const Footer = () => {
         {/* Navigation */}
         <nav className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium">
           <Link href="/" className="hover:text-primary transition-colors">Início</Link>
-          <a href="/menu" className="hover:text-primary transition-colors">Cardápio</a>
-          <a href="/about" className="hover:text-primary transition-colors">Sobre</a>
-          <a href="/contact" className="hover:text-primary transition-colors">Contato</a>
+          <Link href="/#menu" className="hover:text-primary transition-colors">Cardápio</Link>
+          <Link href="/#about" className="hover:text-primary transition-colors">Sobre</Link>
+          <Link href="/#contact" className="hover:text-primary transition-colors">Contato</Link>
         </nav>
         {/* Social Links */}
         <div className="flex gap-3 sm:gap-4">

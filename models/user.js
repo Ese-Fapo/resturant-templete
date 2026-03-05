@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
+  admin: {
+    type: Boolean,
+    default: false,
+  },
   addresses: [
     {
       street: { type: String, trim: true, required: true },

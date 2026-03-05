@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
@@ -8,6 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -18,6 +20,24 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  useEffect(() => {
+    if (success && !isLoggingIn) {
+      const timer = setTimeout(async () => {
+        setIsLoggingIn(true);
+        const result = await signIn("credentials", {
+          redirect: false,
+          email: form.email,
+          password: form.password,
+        });
+        if (result?.ok) {
+          router.push("/profile");
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, form.email, form.password, isLoggingIn, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

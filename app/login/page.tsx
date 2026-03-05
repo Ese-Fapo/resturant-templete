@@ -1,19 +1,29 @@
 "use client";
 
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotMessage, setForgotMessage] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
   const [loginSuccess, setLoginSuccess] = useState(false);
+
+  useEffect(() => {
+    if (loginSuccess) {
+      const timer = setTimeout(() => {
+        router.push("/profile");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loginSuccess, router]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
