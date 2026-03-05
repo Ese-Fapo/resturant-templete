@@ -26,8 +26,23 @@ export const authOptions: NextAuthOptions = {
 
         await connectDB();
 
-        const foundUser = await User.findOne({ email: credentials.email });
+        const normalizedEmail = credentials.email.trim().toLowerCase();
+        const bootstrapAdminEmail = process.env.FIRST_ADMIN_EMAIL?.trim().toLowerCase();
+
+        const foundUser = await User.findOne({ email: normalizedEmail });
         if (!foundUser) return null;
+
+        if (
+          bootstrapAdminEmail &&
+          normalizedEmail === bootstrapAdminEmail &&
+          !foundUser.admin
+        ) {
+          const hasAnyAdmin = Boolean(await User.exists({ admin: true }));
+          if (!hasAnyAdmin) {
+            foundUser.admin = true;
+            await foundUser.save();
+          }
+        }
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,

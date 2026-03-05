@@ -17,7 +17,7 @@ export async function GET() {
 
     const user = await User.findOne(
       { email: session.user.email },
-      { name: 1, email: 1, phone: 1, addresses: 1 }
+      { name: 1, email: 1, phone: 1, addresses: 1, admin: 1 }
     )
       .lean()
       .exec();
@@ -32,6 +32,7 @@ export async function GET() {
         name: user.name,
         email: user.email,
         phone: user.phone || "",
+        admin: user.admin || false,
         addresses: user.addresses || [],
       },
     });

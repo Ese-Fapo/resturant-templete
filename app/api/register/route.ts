@@ -16,7 +16,10 @@ export async function POST(request: Request) {
 
                 await connectDB();
 
-                const existingUser = await User.findOne({ email });
+                const normalizedEmail = String(email).trim().toLowerCase();
+                const bootstrapAdminEmail = process.env.FIRST_ADMIN_EMAIL?.trim().toLowerCase();
+
+                const existingUser = await User.findOne({ email: normalizedEmail });
                 if (existingUser) {
                         return NextResponse.json(
                                 { error: "Este email já está cadastrado." },
@@ -24,12 +27,19 @@ export async function POST(request: Request) {
                         );
                 }
 
+                const hasAnyAdmin = Boolean(await User.exists({ admin: true }));
+                const shouldBeBootstrapAdmin =
+                        Boolean(bootstrapAdminEmail) &&
+                        normalizedEmail === bootstrapAdminEmail &&
+                        !hasAnyAdmin;
+
                 const hashedPassword = await bcrypt.hash(password, 10);
 
                 const createdUser = await User.create({
                         name,
-                        email,
+                        email: normalizedEmail,
                         password: hashedPassword,
+                        admin: shouldBeBootstrapAdmin,
                 });
 
                 return NextResponse.json(
