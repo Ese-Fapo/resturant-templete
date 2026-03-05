@@ -40,6 +40,8 @@ export const authOptions: NextAuthOptions = {
           id: foundUser._id.toString(),
           email: foundUser.email,
           name: foundUser.name,
+          phone: foundUser.phone,
+          admin: foundUser.admin,
         };
       },
     }),
@@ -57,6 +59,7 @@ export const authOptions: NextAuthOptions = {
           email?: string | null;
           image?: string | null;
           phone?: string | null;
+          admin?: boolean;
         };
 
         token.id = typedUser.id ?? typedUser._id ?? token.sub;
@@ -64,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         token.email = typedUser.email ?? token.email;
         token.picture = typedUser.image ?? token.picture;
         token.phone = typedUser.phone ?? token.phone;
+        token.admin = typedUser.admin ?? false;
         return token;
       }
 
@@ -86,6 +90,7 @@ export const authOptions: NextAuthOptions = {
             email?: string | null;
             image?: string | null;
             phone?: string | null;
+            admin?: boolean;
           };
 
           const idString = typeof typedDbUser._id === "string" ? typedDbUser._id : typedDbUser._id?.toString();
@@ -95,6 +100,7 @@ export const authOptions: NextAuthOptions = {
           token.email = typedDbUser.email ?? token.email;
           token.picture = typedDbUser.image ?? token.picture;
           token.phone = typedDbUser.phone ?? token.phone;
+          token.admin = typedDbUser.admin ?? false;
         }
       }
 
@@ -102,12 +108,13 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        const typedToken = token as JWT & { id?: string };
+        const typedToken = token as JWT & { id?: string; admin?: boolean };
         session.user.id = typedToken.id;
         session.user.name = (typedToken.name as string | undefined) ?? session.user.name;
         session.user.email = (typedToken.email as string | undefined) ?? session.user.email;
         session.user.image = (typedToken.picture as string | undefined) ?? session.user.image;
         session.user.phone = (typedToken.phone as string | undefined) ?? session.user.phone;
+        session.user.admin = typedToken.admin ?? false;
       }
       return session;
     },
