@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -65,6 +66,76 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") return true;
+
+      if (!user.email) return false;
+
+      await connectDB();
+
+      const normalizedEmail = user.email.trim().toLowerCase();
+      const bootstrapAdminEmail = process.env.FIRST_ADMIN_EMAIL?.trim().toLowerCase();
+
+      let dbUser = await User.findOne({ email: normalizedEmail });
+
+      if (!dbUser) {
+        const hasAnyAdmin = Boolean(await User.exists({ admin: true }));
+        const shouldBeBootstrapAdmin =
+          Boolean(bootstrapAdminEmail) &&
+          normalizedEmail === bootstrapAdminEmail &&
+          !hasAnyAdmin;
+
+        const randomPassword = await bcrypt.hash(crypto.randomUUID(), 10);
+
+        dbUser = await User.create({
+          name: user.name?.trim() || normalizedEmail.split("@")[0],
+          email: normalizedEmail,
+          image: user.image || "",
+          password: randomPassword,
+          admin: shouldBeBootstrapAdmin,
+        });
+      } else {
+        let shouldSave = false;
+
+        if (user.name && user.name !== dbUser.name) {
+          dbUser.name = user.name;
+          shouldSave = true;
+        }
+
+        if (user.image && user.image !== dbUser.image) {
+          dbUser.image = user.image;
+          shouldSave = true;
+        }
+
+        if (
+          bootstrapAdminEmail &&
+          normalizedEmail === bootstrapAdminEmail &&
+          !dbUser.admin
+        ) {
+          const hasAnyAdmin = Boolean(await User.exists({ admin: true }));
+          if (!hasAnyAdmin) {
+            dbUser.admin = true;
+            shouldSave = true;
+          }
+        }
+
+        if (shouldSave) {
+          await dbUser.save();
+        }
+      }
+
+      const typedUser = user as {
+        id?: string;
+        phone?: string | null;
+        admin?: boolean;
+      };
+
+      typedUser.id = dbUser._id.toString();
+      typedUser.phone = dbUser.phone || "";
+      typedUser.admin = Boolean(dbUser.admin);
+
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         const typedUser = user as {
@@ -89,14 +160,20 @@ export const authOptions: NextAuthOptions = {
       // Refresh token data from DB on subsequent calls to reflect profile edits
       if (token.id || token.email) {
         await connectDB();
-        const dbUser = await User.findOne({
-          $or: [
-            { _id: token.id },
-            { email: token.email },
-          ],
-        })
-          .lean()
-          .exec();
+
+        const orClauses: Array<Record<string, unknown>> = [];
+
+        if (typeof token.id === "string" && mongoose.isValidObjectId(token.id)) {
+          orClauses.push({ _id: token.id });
+        }
+
+        if (typeof token.email === "string" && token.email.trim()) {
+          orClauses.push({ email: token.email.trim().toLowerCase() });
+        }
+
+        const dbUser = orClauses.length
+          ? await User.findOne({ $or: orClauses }).lean().exec()
+          : null;
 
         if (dbUser) {
           const typedDbUser = dbUser as {

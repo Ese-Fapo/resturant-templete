@@ -47,6 +47,10 @@ export default function LoginPage() {
     }
   }
 
+  async function handleGoogleLogin() {
+    await signIn("google", { callbackUrl: "/profile" });
+  }
+
   return (
     <section className="mt-8 "> 
       <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
@@ -99,8 +103,9 @@ export default function LoginPage() {
 
         <div className="text-center my-2">Ou login com </div>
 
-         <button onClick={() => signIn('google')}
-            type="submit"
+         <button
+            onClick={handleGoogleLogin}
+            type="button"
             className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
           >
             Google
