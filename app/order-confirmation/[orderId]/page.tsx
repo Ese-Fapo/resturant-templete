@@ -77,7 +77,7 @@ export default function OrderConfirmationPage({
       <section className="min-h-screen bg-gradient-to-br from-lime-50 via-green-50 to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
-          <p className="mt-4 text-gray-600">Carregando detalhes do pedido...</p>
+          <p className="mt-4 text-gray-600">Carregando detalhes do pedido.....</p>
         </div>
       </section>
     );
