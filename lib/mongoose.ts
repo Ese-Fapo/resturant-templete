@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI =
-	process.env.MONGODB_URI || "mongodb://localhost:27017/food_ordering";
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+	throw new Error(
+		"Missing MONGODB_URI. Configure the same shared MongoDB URI in your environment (local + deployment) so uploaded images/data are visible to all users."
+	);
+}
 
 type MongooseCache = {
 	conn: mongoose.Mongoose | null;
