@@ -3,11 +3,13 @@
 import React, { useState } from 'react'
 import { AuthStatus } from './AuthStatus';
 import { useSession } from 'next-auth/react';
+import { useCart } from '@/hooks/useCart';
 
 import Link from 'next/link'
 import { IoIosLogIn } from "react-icons/io";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 
 
@@ -15,6 +17,7 @@ import { HiMenuAlt3, HiX } from "react-icons/hi";
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: session } = useSession();
+  const cart = useCart();
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl shadow-xl border-b border-emerald-100/50">
       {/* Decorative top gradient line */}
@@ -73,6 +76,22 @@ const Header = () => {
               className="relative px-4 py-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
             >
               <span className="relative z-10">Contato</span>
+              <div className="absolute inset-0 bg-emerald-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </Link>
+            
+            {/* Cart Link */}
+            <Link 
+              href="/cart" 
+              className="relative px-4 py-2 ml-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <AiOutlineShoppingCart className="text-xl" />
+                {cart.itemCount > 0 && (
+                  <span className="absolute -top-2 -right-1 bg-red-500 text-xs font-bold text-white rounded-full w-5 h-5 flex items-center justify-center">
+                    {cart.itemCount}
+                  </span>
+                )}
+              </span>
               <div className="absolute inset-0 bg-emerald-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </Link>
             
@@ -187,6 +206,21 @@ const Header = () => {
           >
             <span className="text-xl">📞</span>
             Contato
+          </Link>
+
+          {/* Mobile Cart Link */}
+          <Link
+            href="/cart"
+            className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 relative"
+            onClick={() => setMenuOpen(false)}
+          >
+            <span className="text-xl">🛒</span>
+            <span>Carrinho</span>
+            {cart.itemCount > 0 && (
+              <span className="absolute right-4 bg-red-500 text-xs font-bold text-white rounded-full w-5 h-5 flex items-center justify-center">
+                {cart.itemCount}
+              </span>
+            )}
           </Link>
 
           {/* Mobile Auth Section */}
