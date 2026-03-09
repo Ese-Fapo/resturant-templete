@@ -1,12 +1,16 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const getMongoUri = () => {
+	const uri = process.env.MONGODB_URI?.trim();
 
-if (!MONGODB_URI) {
-	throw new Error(
-		"Missing MONGODB_URI. Configure the same shared MongoDB URI in your environment (local + deployment) so uploaded images/data are visible to all users."
-	);
-}
+	if (!uri) {
+		throw new Error(
+			"Missing MONGODB_URI. Configure the same shared MongoDB URI in your environment (local + deployment) so uploaded images/data are visible to all users."
+		);
+	}
+
+	return uri;
+};
 
 type MongooseCache = {
 	conn: mongoose.Mongoose | null;
@@ -23,7 +27,8 @@ export async function connectDB() {
 	if (cached.conn) return cached.conn;
 
 	if (!cached.promise) {
-		cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
+		const mongoUri = getMongoUri();
+		cached.promise = mongoose.connect(mongoUri, { bufferCommands: false });
 	}
 
 	cached.conn = await cached.promise;
