@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -9,6 +9,9 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/profile";
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -19,11 +22,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (loginSuccess) {
       const timer = setTimeout(() => {
-        router.push("/profile");
+        router.push(callbackUrl);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [loginSuccess, router]);
+  }, [loginSuccess, router, callbackUrl]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,7 +51,7 @@ export default function LoginPage() {
   }
 
   async function handleGoogleLogin() {
-    await signIn("google", { callbackUrl: "/profile" });
+    await signIn("google", { callbackUrl });
   }
 
   return (

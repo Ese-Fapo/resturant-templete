@@ -33,7 +33,7 @@ export default function CheckoutPage() {
   // Redirect if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login");
+      router.replace("/login?callbackUrl=/checkout");
     }
   }, [status, router]);
 

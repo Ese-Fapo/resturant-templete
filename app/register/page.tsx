@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
@@ -10,6 +10,8 @@ import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/profile";
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -32,12 +34,12 @@ export default function RegisterPage() {
           password: form.password,
         });
         if (result?.ok) {
-          router.push("/profile");
+          router.push(callbackUrl);
         }
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [success, form.email, form.password, isLoggingIn, router]);
+  }, [success, form.email, form.password, isLoggingIn, router, callbackUrl]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -182,7 +184,7 @@ export default function RegisterPage() {
           </button>
           <div className="text-center mt-4">ou fazer login com </div>
 
- <button onClick={() => signIn('google')}
+ <button onClick={() => signIn('google', { callbackUrl })}
             type="button"
             className="w-full py-2 px-4 bg-gray-400 hover:bg-white/90 text-gray-800 font-semibold rounded-lg shadow-md transition"
           >
@@ -192,7 +194,7 @@ export default function RegisterPage() {
 
           <div className="text-center mt-4">
             <p className="font-bold text-gray-600">
-              Já tem uma conta? <a href="/login" className="text-emerald-600 hover:text-emerald-800 text-2xl underline">Entrar</a>
+              Já tem uma conta? <a href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-emerald-600 hover:text-emerald-800 text-2xl underline">Entrar</a>
             </p>
           </div>
         </form>
