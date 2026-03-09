@@ -279,22 +279,30 @@ export default function ProfilePage() {
 
   return (
     <section className="text-center items-center mt-10 px-4">
-        <div className="flex justify-between items-start mb-8">
-          <div className="flex-1">
+        <div className="flex justify-between items-start mb-8 flex-wrap gap-4">
+          <div className="flex-1 min-w-[250px]">
             <Link href="/profile" className="text-3xl sm:text-4xl font-bold text-emerald-700 inline-block hover:text-emerald-800 transition-colors">
               Minha Profile
             </Link>
             <p className="text-gray-600 mt-2 mb-4">Gerencie suas informações pessoais e endereços aqui.</p>
           </div>
           
-          {!session?.user?.admin && (
-            <Link 
-              href="/admin-login" 
-              className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors shadow-md hover:shadow-lg"
+          <div className="flex gap-3 flex-wrap">
+            <Link
+              href="/orders"
+              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors shadow-md hover:shadow-lg inline-flex items-center gap-2"
             >
-              🔐 Admin
+              📦 Meus Pedidos
             </Link>
-          )}
+            {!session?.user?.admin && (
+              <Link 
+                href="/admin-login" 
+                className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors shadow-md hover:shadow-lg"
+              >
+                🔐 Admin
+              </Link>
+            )}
+          </div>
         </div>
           {session?.user?.admin && (
             <div className="flex flex-wrap gap-2 items-center mt-4 mb-6 pt-4 border-t border-gray-200">

@@ -13,6 +13,26 @@ type UserAddress = {
   label: string;
 };
 
+type OrderItemType = {
+  name: string;
+  quantity: number;
+  price: number;
+};
+
+type OrderDocument = {
+  _id: string;
+  total: number;
+  status: string;
+  paymentStatus: string;
+  createdAt: Date;
+  items: OrderItemType[];
+  deliveryAddress: {
+    street: string;
+    city: string;
+    postalCode: string;
+  };
+};
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
@@ -140,14 +160,26 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get user's recent orders
+    // Get user's orders with full details
     const orders = await Order.find({ user: user._id })
-      .select("total status createdAt items")
       .sort({ createdAt: -1 })
-      .limit(10)
       .lean();
 
-    return NextResponse.json({ orders });
+    const formattedOrders = orders.map((order: OrderDocument) => ({
+      id: order._id.toString(),
+      total: order.total,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      createdAt: order.createdAt,
+      items: order.items.map((item: OrderItemType) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      deliveryAddress: order.deliveryAddress,
+    }));
+
+    return NextResponse.json({ orders: formattedOrders });
   } catch (error) {
     console.error("Get orders error:", error);
     return NextResponse.json(

@@ -52,6 +52,15 @@ const Header = () => {
               <span className="relative z-10">Cardápio</span>
               <div className="absolute inset-0 bg-emerald-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </Link>
+            {session && (
+              <Link 
+                href="/orders" 
+                className="relative px-4 py-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
+              >
+                <span className="relative z-10">Meus Pedidos</span>
+                <div className="absolute inset-0 bg-emerald-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              </Link>
+            )}
             <Link 
               href="#about" 
               className="relative px-4 py-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
@@ -153,6 +162,16 @@ const Header = () => {
             <span className="text-xl">📋</span>
             Cardápio
           </Link>
+          {session && (
+            <Link
+              href="/orders"
+              className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className="text-xl">📦</span>
+              Meus Pedidos
+            </Link>
+          )}
           <Link
             href="#about"
             className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
