@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useCart } from "@/hooks/useCart";
 
 type Category = {
   id: string;
@@ -26,6 +27,7 @@ type MenuItem = {
 export default function MenuPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const cart = useCart();
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
@@ -33,6 +35,7 @@ export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [addedToCart, setAddedToCart] = useState<string | null>(null);
 
   const fetchMenuItems = async () => {
     setIsFetching(true);
@@ -72,6 +75,20 @@ export default function MenuPage() {
     }
   };
 
+  const handleAddToCart = (item: MenuItem) => {
+    cart.addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      image: item.image,
+      category: item.category,
+    });
+
+    setAddedToCart(item.id);
+    setTimeout(() => setAddedToCart(null), 2000);
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
@@ -100,21 +117,36 @@ export default function MenuPage() {
   const featuredItems = items.filter((item) => item.featured);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-lime-50 via-green-50 to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-linear-to-br from-lime-50 via-green-50 to-emerald-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Admin Link */}
+        {/* Header with Admin Link and Cart */}
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-2 font-semibold">
             <span>←</span> Voltar
           </Link>
-          {isAdmin && (
-            <Link
-              href="/menu/admin"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-semibold shadow transition-all duration-200"
-            >
-              Gerenciar Cardápio
-            </Link>
-          )}
+          <div className="flex items-center gap-4">
+            {!cart.isEmpty && (
+              <Link
+                href="/cart"
+                className="relative px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-semibold shadow transition-all duration-200 inline-flex items-center gap-2"
+              >
+                🛒 Carrinho
+                {cart.itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {cart.itemCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href="/menu/admin"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-semibold shadow transition-all duration-200"
+              >
+                Gerenciar Cardápio
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Page Title */}
@@ -199,7 +231,7 @@ export default function MenuPage() {
                     className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-emerald-200 transform hover:-translate-y-1"
                   >
                     {/* Image */}
-                    <div className="relative w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="relative w-full h-56 bg-linear-to-br from-gray-100 to-gray-200">
                       {item.image ? (
                         <Image
                           src={item.image}
@@ -243,10 +275,14 @@ export default function MenuPage() {
                           R$ {item.price.toFixed(2).replace(".", ",")}
                         </div>
                         <button
-                          type="button"
-                          className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                          onClick={() => handleAddToCart(item)}
+                          className={`px-6 py-2.5 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 ${
+                            addedToCart === item.id
+                              ? "bg-green-500 text-white"
+                              : "bg-linear-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white"
+                          }`}
                         >
-                          Pedir
+                          {addedToCart === item.id ? "✅ Adicionado" : "🛒 Pedir"}
                         </button>
                       </div>
                     </div>
