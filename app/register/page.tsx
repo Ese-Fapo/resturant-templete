@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ConfettiAnimation from "@/components/ui/ConfettiAnimation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -8,7 +8,7 @@ import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/profile";
@@ -200,6 +200,14 @@ export default function RegisterPage() {
         </form>
       </div>
     </section>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="text-center mt-10">Carregando...</div>}>
+      <RegisterPageContent />
+    </Suspense>
   );
 }
     

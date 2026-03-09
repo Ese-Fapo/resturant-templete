@@ -11,10 +11,12 @@ type OrderItemType = {
 };
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { orderId: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
+    const { orderId } = await params;
+
     const session = await getServerSession();
 
     if (!session?.user?.email) {
@@ -30,7 +32,7 @@ export async function GET(
     }
 
     const order = await Order.findOne({
-      _id: params.orderId,
+      _id: orderId,
       user: user._id,
     }).populate("items.menuItem", "name price image");
 

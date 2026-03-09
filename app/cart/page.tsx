@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/hooks/useCart";
 
 export default function CartPage() {
   const cart = useCart();
+  const { status } = useSession();
 
   if (cart.isEmpty) {
     return (
@@ -169,12 +171,26 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <Link
-                href="/checkout"
-                className="block w-full px-6 py-3 bg-linear-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white rounded-full font-bold shadow-lg text-center transition-all duration-200 transform hover:scale-105"
-              >
-                Ir para Checkout
-              </Link>
+              {status === "authenticated" ? (
+                <Link
+                  href="/checkout"
+                  className="block w-full px-6 py-3 bg-linear-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white rounded-full font-bold shadow-lg text-center transition-all duration-200 transform hover:scale-105"
+                >
+                  Ir para Checkout
+                </Link>
+              ) : (
+                <>
+                  <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+                    Faça login para finalizar sua compra com segurança.
+                  </div>
+                  <Link
+                    href="/login?callbackUrl=/checkout"
+                    className="block w-full px-6 py-3 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-full font-bold shadow-lg text-center transition-all duration-200 transform hover:scale-105"
+                  >
+                    Entrar para Finalizar
+                  </Link>
+                </>
+              )}
 
               <button
                 onClick={() => cart.clearCart()}

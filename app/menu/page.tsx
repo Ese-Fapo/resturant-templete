@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -25,8 +24,7 @@ type MenuItem = {
 };
 
 export default function MenuPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const cart = useCart();
 
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -90,14 +88,8 @@ export default function MenuPage() {
   };
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/login");
-    }
-
-    if (status === "authenticated") {
-      fetchMenuItems();
-    }
-  }, [status, router]);
+    fetchMenuItems();
+  }, []);
 
   useEffect(() => {
     if (selectedCategory === "all") {
@@ -109,7 +101,7 @@ export default function MenuPage() {
     }
   }, [selectedCategory, items]);
 
-  if (status === "loading" || status === "unauthenticated") {
+  if (isFetching && items.length === 0) {
     return <div className="text-center mt-10">Carregando...</div>;
   }
 
