@@ -65,14 +65,14 @@ const Header = () => {
               </Link>
             )}
             <Link 
-              href="#about" 
+              href="/#about" 
               className="relative px-4 py-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
             >
               <span className="relative z-10">Sobre nós</span>
               <div className="absolute inset-0 bg-emerald-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </Link>
             <Link 
-              href="#contact" 
+              href="/#contact" 
               className="relative px-4 py-2 text-gray-700 font-semibold rounded-xl hover:text-emerald-600 transition-all duration-200 group"
             >
               <span className="relative z-10">Contato</span>
@@ -192,7 +192,7 @@ const Header = () => {
             </Link>
           )}
           <Link
-            href="#about"
+            href="/#about"
             className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
             onClick={() => setMenuOpen(false)}
           >
@@ -200,7 +200,7 @@ const Header = () => {
             Sobre nós
           </Link>
           <Link
-            href="#contact"
+            href="/#contact"
             className="flex items-center gap-3 px-4 py-3.5 text-gray-700 font-semibold rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
             onClick={() => setMenuOpen(false)}
           >
