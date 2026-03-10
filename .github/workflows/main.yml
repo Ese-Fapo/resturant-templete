@@ -1,0 +1,35 @@
+
+
+# Nome do workflow (aparece na aba "Actions")
+name: Pipeline CI/CD
+
+# Quando o pipeline será executado
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Habilita o botão "Run workflow" no GitHub
+
+jobs:
+  # Job de build
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Baixar o código do repositório
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # Instalar Node.js
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Instalar dependências
+      - name: Instalar dependências
+        run: npm install
+
+      # Rodar build
+      - name: Rodar build
+        run: npm run build
