@@ -42,8 +42,20 @@ export const Footer = () => {
           </a>
         </div>
       </div>
+     
       <div className="mt-6 sm:mt-8 text-center text-xs text-gray-500">
         &copy; {new Date().getFullYear()} Chefs. Todos os direitos reservados..
+        <div className="mt-2">
+          Site created by:{" "}
+          <a
+            href="https://sitesprofissionai.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-300 underline underline-offset-4 transition-colors hover:text-white"
+          >
+            Ese Faps
+          </a>
+        </div>
       </div>
     </footer>
   );
